@@ -41,6 +41,7 @@ exports.login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  
 };
 
 exports.forgetPassword = (req, res) => {
