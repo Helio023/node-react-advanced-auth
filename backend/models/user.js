@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
         validator: function (el) {
           return el === this.password;
         },
+        message: 'The passwords do not match',
       },
     },
     passwordResetToken: String,
@@ -39,14 +40,22 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) next();
+  if (!this.isModified('password')) {
+    return next();
+  }
 
   const salt = await bcrypt.genSalt(10);
 
   this.password = await bcrypt.hash(this.password, salt);
 
   this.passwordConfirm = undefined;
+
+  next();
 });
+
+userSchema.methods.matchPassword = async function (pass) {
+  return await bcrypt.compare(pass, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
