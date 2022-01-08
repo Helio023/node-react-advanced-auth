@@ -8,6 +8,7 @@ connectDb();
 app.use(express.json({ limit: '10kb' }));
 
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/private'));
 
 app.use(errorHandler)
 
