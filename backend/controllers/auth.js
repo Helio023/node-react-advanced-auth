@@ -1,6 +1,7 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ErrorResponse = require('./../utils/errorResponde');
-const jwt = require('jsonwebtoken');
+const sendEmail = require('../utils/sendEmail');
 
 const createToken = (user, statusCode, res) => {
   const token = user.signToken();
@@ -74,8 +75,48 @@ exports.protect = async (req, res, next) => {
     next(error.message);
   }
 };
-exports.forgetPassword = (req, res) => {
-  res.send('forgetPassword');
+
+exports.forgetPassword = async (req, res, next) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(new ErrorResponse('No user with this email', 404));
+    }
+
+    const resetToken = user.getResetToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
+    const message = `
+      <h1>You've requested a password reset</h1>
+      <p>Please click the following url to reset</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+    `;
+
+    try {
+      sendEmail({
+        to: user.email,
+        subject: 'Password reset',
+        text: message,
+      });
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Email sent!',
+      });
+    } catch (error) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return next(new ErrorResponse('Email could not be sent', 500));
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 exports.resetPassword = (req, res) => {
   res.send('resetPassword');
