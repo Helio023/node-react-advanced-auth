@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto')
 const User = require('../models/user');
 const ErrorResponse = require('./../utils/errorResponde');
 const sendEmail = require('../utils/sendEmail');
@@ -79,6 +80,10 @@ exports.protect = async (req, res, next) => {
 exports.forgetPassword = async (req, res, next) => {
   const { email } = req.body;
 
+  if (!email) {
+    return next(new ErrorResponse('Please provide the email', 403));
+  }
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -89,23 +94,14 @@ exports.forgetPassword = async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
-    const message = `
-      <h1>You've requested a password reset</h1>
-      <p>Please click the following url to reset</p>
-      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
-    `;
+    const resetUrl = `http://localhost:5000/api/auth/passwordreset/${resetToken}`;
 
+    console.log(resetUrl);
     try {
-      sendEmail({
-        to: user.email,
-        subject: 'Password reset',
-        text: message,
-      });
 
       res.status(200).json({
         status: 'success',
-        message: 'Email sent!',
+        link: resetUrl,
       });
     } catch (error) {
       user.passwordResetToken = undefined;
@@ -118,6 +114,30 @@ exports.forgetPassword = async (req, res, next) => {
     next(error);
   }
 };
-exports.resetPassword = (req, res) => {
-  res.send('resetPassword');
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(new AppError('Token is invalid or has expired', 400));
+    }
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    createToken(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
 };
