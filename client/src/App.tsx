@@ -1,10 +1,39 @@
-import React from 'react';
+import styled from 'styled-components';
+import { Routes, Route} from 'react-router-dom';
+import Register from './core/components/Register';
+import Login from './core/components/Login';
+import ForgetPassword from './core/components/ForgetPassword';
+import ResetPassword from './core/components/ResetPassword';
+import Private from './core/components/Private';
+import PrivateRoute from './core/Routing/PrivateRoute';
+
+const Container = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const App = () => {
   return (
-    <div>
-      <h1>App</h1>
-    </div>
+    <Container>
+      <Routes>
+        <Route path='register' element={<Register />} />
+        <Route path='login' element={<Login />} />
+        <Route path='forgetpassword' element={<ForgetPassword />} />
+        <Route path='resetpassword/:token' element={<ResetPassword />} />
+        <Route
+          path='private'
+          element={
+            <PrivateRoute>
+              <Private />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </Container>
   );
 };
 
