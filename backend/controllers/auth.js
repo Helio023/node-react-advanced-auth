@@ -94,7 +94,7 @@ exports.forgetPassword = async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `http://localhost:5000/api/auth/passwordreset/${resetToken}`;
+    const resetUrl = `http://localhost:3000/api/auth/passwordreset/${resetToken}`;
 
     console.log(resetUrl);
     try {
