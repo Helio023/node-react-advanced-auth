@@ -16,6 +16,11 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  padding: 50px;
+
+  @media only screen and (max-width: 450px) {
+    padding: 20px;
+  }
 `;
 
 const App = () => {

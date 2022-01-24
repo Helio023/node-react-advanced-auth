@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 const Container = styled.div``;
 const Header = styled.h1`
   font-size: 36px;
+
+  @media only screen and (max-width: 450px) {
+    font-size: 26px;
+  }
 `;
 
 const ButtonsGroup = styled.div`

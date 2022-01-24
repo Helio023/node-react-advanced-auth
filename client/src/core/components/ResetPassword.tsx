@@ -7,7 +7,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 //Styles
 const Form = styled.form`
-  width: 400px;
+  /* width: 400px; */
+  max-width: 400px;
   border-radius: 5px;
   background-color: #fff;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
