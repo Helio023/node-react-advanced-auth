@@ -3,4 +3,6 @@ exports.private = (req, res, next) => {
     status: 'success',
     message: "You've got access to this private route",
   });
+
+  next()
 };
