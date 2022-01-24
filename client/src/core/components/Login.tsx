@@ -63,7 +63,10 @@ const LoginLink = styled.span`
   color: teal;
   display: inline-block;
   margin-top: 10px;
-  font-size: 16px;
+  font-size: 14px;
+  &:not(:last-child) {
+    margin-top: 50px;
+  }
 `;
 
 type UserData = {
@@ -104,7 +107,7 @@ const Register = () => {
   return (
     <Form onSubmit={handleSubmit(onRegister)}>
       <FormHeader>Login</FormHeader>
-      {hasError && <Error>Email ou senha errado!</Error>}
+      {hasError && <Error>Invalid credentials!</Error>}
       <FormGroup>
         <FormLabel>Email</FormLabel>
         <FormInput
@@ -135,6 +138,9 @@ const Register = () => {
       {isLoading ? <Button>Loging...</Button> : <Button>Login</Button>}
       <LoginLink>
         Don't have an account? <Link to='/register'>Register</Link>
+      </LoginLink>
+      <LoginLink>
+        Forgot password? <Link to='/forgetpassword'>Reset password</Link>
       </LoginLink>
     </Form>
   );

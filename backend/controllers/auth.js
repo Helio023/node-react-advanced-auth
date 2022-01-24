@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto')
+const crypto = require('crypto');
 const User = require('../models/user');
 const ErrorResponse = require('./../utils/errorResponde');
 const sendEmail = require('../utils/sendEmail');
@@ -94,11 +94,9 @@ exports.forgetPassword = async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `http://localhost:3000/api/auth/passwordreset/${resetToken}`;
+    const resetUrl = `passwordreset/${resetToken}`;
 
-    console.log(resetUrl);
     try {
-
       res.status(200).json({
         status: 'success',
         link: resetUrl,
